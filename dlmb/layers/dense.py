@@ -80,23 +80,23 @@ class Dense(Base_layer):
 
 			# Sets the bias' based on self.bias_initializer.
 			if self.bias_initializer.lower() in ("zeros", "zero"):
-				self.bias = I.zeros((1,1))
+				self.bias = I.zeros((self.layer_shape[0],1))
 			elif self.bias_initializer.lower() in ("ones", "one"):
-				self.bias = I.ones((1,1))
+				self.bias = I.ones((self.layer_shape[0],1))
 			elif self.bias_initializer.lower() in ("random"):
-				self.bias = I.random((1,1))
+				self.bias = I.random((self.layer_shape[0],1))
 			elif self.bias_initializer.lower() in ("uniform"):
-				self.bias = I.uniform((1,1))
+				self.bias = I.uniform((self.layer_shape[0],1))
 			elif self.bias_initializer.lower() in ("xavier"):
-				self.bias = I.xavier((1,1))
+				self.bias = I.xavier((self.layer_shape[0],1))
 			elif self.bias_initializer.lower() in ("xavier_uniform"):
-				self.bias = I.xavier_uniform((1,1))
+				self.bias = I.xavier_uniform((self.layer_shape[0],1))
 			elif self.bias_initializer.lower() in ("sigmoid_uniform"):
-				self.bias = I.sigmoid_uniform((1,1))
+				self.bias = I.sigmoid_uniform((self.layer_shape[0],1))
 			elif self.bias_initializer.lower() in ("relu"):
-				self.bias = I.relu((1,1))
+				self.bias = I.relu((self.layer_shape[0],1))
 			elif self.bias_initializer.lower() in ("relu_uniform"):
-				self.bias = I.relu_uniform((1,1))
+				self.bias = I.relu_uniform((self.layer_shape[0],1))
 			else:
 				raise ValueError(f"{self.bias_initializer} is not currently an available bias initializer.")
 
