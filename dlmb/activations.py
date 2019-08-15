@@ -13,15 +13,15 @@ class Base_activation(metaclass=ABCMeta):
 
 	# ------------------------------------------------------------------------------------------------------------------------
 	@abstractmethod
-	def function(self, data):
+	def map_data(self, data):
 		"""
 		This is where the math happens. The function takes some data and applies a mathematical mapping to it.
 	
 		Arguments:
-			data - type = Numpy array: The data that the function will be mapping to an output.
+			data - Numpy array: The data that the function will be mapping to an output.
 
 		Return:
-			output - type = Numpy array: The mapped data.
+			output - Numpy array: The mapped data.
 
 		"""
 
@@ -29,15 +29,15 @@ class Base_activation(metaclass=ABCMeta):
 
 	# ------------------------------------------------------------------------------------------------------------------------
 	@abstractmethod
-	def derivative(self, data):
+	def calculate_gradients(self, data):
 		"""
 		Calculates the derivative of the activation function.
 	
 		Arguments:
-			data - type = Numpy array: The data that the derivative will be calculate with respect to.
+			data - Numpy array: The data that the derivative will be calculate W.R.T.
 
 		Return:
-			output - type = Numpy array: The calculated derivative.
+			output - Numpy array: The calculated derivative.
 
 		"""
 
@@ -54,30 +54,30 @@ class Linear(Base_activation):
 		self.name = "linear"
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def function(self, data):
+	def map_data(self, data):
 		"""
 		Maps some data to an output with the form of f(x) = x.
 
 		Arguments:
-			data - type = Numpy array: The data that the function will be mapping to an output.
+			data - Numpy array: The data that the function will be mapping to an output.
 
 		Return:
-			output - type = Numpy array: The mapped data.
+			output - Numpy array: The mapped data.
 
 		"""
 
 		return data
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def derivative(self, data):
+	def calculate_gradients(self, data):
 		"""
 		Calculates the derivative of the activation function.
 	
 		Arguments:
-			data - type = Numpy array: The data that the derivative will be calculate with respect to.
+			data - Numpy array: The data that the derivative will be calculate W.R.T.
 
 		Return:
-			output - type = Numpy array: The calculated derivative.
+			output - Numpy array: The calculated derivative.
 
 		"""
 
@@ -94,15 +94,15 @@ class Softmax(Base_activation):
 		self.name = "softmax"
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def function(self, data):
+	def map_data(self, data):
 		"""
 		Maps some data to an output with the form of f(x) = e^x_k / sum(e^x_i).
 
 		Arguments:
-			data - type = Numpy array: The data that the function will be mapping to an output.
+			data - Numpy array: The data that the function will be mapping to an output.
 
 		Return:
-			output - type = Numpy array: The mapped data.
+			output - Numpy array: The mapped data.
 
 		"""
 
@@ -110,19 +110,19 @@ class Softmax(Base_activation):
 		return e_x/(np.sum(e_x, axis=1, keepdims=True)+1.0e-8)
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def derivative(self, data):
+	def calculate_gradients(self, data):
 		"""
 		Calculates the derivative of the activation function.
 	
 		Arguments:
-			data - type = Numpy array: The data that the derivative will be calculate with respect to.
+			data - Numpy array: The data that the derivative will be calculate W.R.T.
 
 		Return:
-			output - type = Numpy array: The calculated derivative.
+			output - Numpy array: The calculated derivative.
 
 		"""
 
-		a = np.reshape(self.function(data), (data.shape[0], data.shape[1], 1))
+		a = np.reshape(self.map_data(data), (data.shape[0], data.shape[1], 1))
 		e = np.ones((a.shape[1], 1))
 		i = np.identity(a.shape[1])
 		return (a*e.T) * (i - e*a.reshape((a.shape[0], a.shape[2], a.shape[1])))
@@ -138,34 +138,34 @@ class Sigmoid(Base_activation):
 		self.name = "sigmoid"
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def function(self, data):
+	def map_data(self, data):
 		"""
 		Maps some data to an output with the form of f(x) = 1/(1+e^-x).
 
 		Arguments:
-			data - type = Numpy array: The data that the function will be mapping to an output.
+			data - Numpy array: The data that the function will be mapping to an output.
 
 		Return:
-			output - type = Numpy array: The mapped data.
+			output - Numpy array: The mapped data.
 
 		"""
 
 		return 1/(1+np.exp(-data))
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def derivative(self, data):
+	def calculate_gradients(self, data):
 		"""
 		Calculates the derivative of the activation function.
 	
 		Arguments:
-			data - type = Numpy array: The data that the derivative will be calculate with respect to.
+			data - Numpy array: The data that the derivative will be calculate W.R.T.
 
 		Return:
-			output - type = Numpy array: The calculated derivative.
+			output - Numpy array: The calculated derivative.
 
 		"""
 
-		return self.function(data) * (1-self.function(data))
+		return self.map_data(data) * (1-self.map_data(data))
 
 # ------------------------------------------------------------------------------------------------------------------------
 class Tanh(Base_activation):
@@ -178,34 +178,34 @@ class Tanh(Base_activation):
 		self.name = "tanh"
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def function(self, data):
+	def map_data(self, data):
 		"""
 		Maps some data to an output with the form of f(x) = sinh(x)/cosh(x).
 
 		Arguments:
-			data - type = Numpy array: The data that the function will be mapping to an output.
+			data - Numpy array: The data that the function will be mapping to an output.
 
 		Return:
-			output - type = Numpy array: The mapped data.
+			output - Numpy array: The mapped data.
 
 		"""
 
 		return np.tanh(data)
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def derivative(self, data):
+	def calculate_gradients(self, data):
 		"""
 		Calculates the derivative of the activation function.
 	
 		Arguments:
-			data - type = Numpy array: The data that the derivative will be calculate with respect to.
+			data - Numpy array: The data that the derivative will be calculate W.R.T.
 
 		Return:
-			output - type = Numpy array: The calculated derivative.
+			output - Numpy array: The calculated derivative.
 
 		"""
 
-		return 1-self.function(data)**2
+		return 1-self.map_data(data)**2
 
 # ------------------------------------------------------------------------------------------------------------------------
 class ReLU(Base_activation):
@@ -218,30 +218,30 @@ class ReLU(Base_activation):
 		self.name = "relu"
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def function(self, data):
+	def map_data(self, data):
 		"""
 		Maps some data to an output with the form of f(x) = max(x, 0).
 
 		Arguments:
-			data - type = Numpy array: The data that the function will be mapping to an output.
+			data - Numpy array: The data that the function will be mapping to an output.
 
 		Return:
-			output - type = Numpy array: The mapped data.
+			output - Numpy array: The mapped data.
 
 		"""
 
 		return np.where(data>=0, data, 0)
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def derivative(self, data):
+	def calculate_gradients(self, data):
 		"""
 		Calculates the derivative of the activation function.
 	
 		Arguments:
-			data - type = Numpy array: The data that the derivative will be calculate with respect to.
+			data - Numpy array: The data that the derivative will be calculate W.R.T.
 
 		Return:
-			output - type = Numpy array: The calculated derivative.
+			output - Numpy array: The calculated derivative.
 
 		"""
 
@@ -254,7 +254,7 @@ class Leaky_ReLU(Base_activation):
 		The Leaky_ReLU class is a suggested improved version of the ReLU function. Commonly used for hidden layers.
 		
 		Arguments:
-			alpha - type = float: A small number which adds some flow for the data if it's less than zero, fixes the dying ReLU problem.
+			alpha - float: A small number which adds some flow for the data if it's less than zero, fixes the dying ReLU problem.
 
 		"""
 
@@ -262,30 +262,30 @@ class Leaky_ReLU(Base_activation):
 		self.name = "leaky_relu"
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def function(self, data):
+	def map_data(self, data):
 		"""
 		Maps some data to an output with the form of f(x) = max(x, alpha*x).
 
 		Arguments:
-			data - type = Numpy array: The data that the function will be mapping to an output.
+			data - Numpy array: The data that the function will be mapping to an output.
 
 		Return:
-			output - type = Numpy array: The mapped data.
+			output - Numpy array: The mapped data.
 
 		"""
 
 		return np.where(data>=0, data, alpha*data)
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def derivative(self, data):
+	def calculate_gradients(self, data):
 		"""
 		Calculates the derivative of the activation function.
 	
 		Arguments:
-			data - type = Numpy array: The data that the derivative will be calculate with respect to.
+			data - Numpy array: The data that the derivative will be calculate W.R.T.
 
 		Return:
-			output - type = Numpy array: The calculated derivative.
+			output - Numpy array: The calculated derivative.
 
 		"""
 
@@ -298,7 +298,7 @@ class ELU(Base_activation):
 		The ELU class is a suggested improved version of the ReLU function. Commonly used for hidden layers.
 		
 		Arguments:
-			alpha - type = float: A small number which adds some flow for the data if it's less than zero, fixes the dying ReLU problem.
+			alpha - float: A small number which adds some flow for the data if it's less than zero, fixes the dying ReLU problem.
 
 		"""
 
@@ -306,31 +306,65 @@ class ELU(Base_activation):
 		self.name = "elu"
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def function(self, data):
+	def map_data(self, data):
 		"""
 		Maps some data to an output with the form of f(x) = max(x, alpha*(e^x - 1)).
 
 		Arguments:
-			data - type = Numpy array: The data that the function will be mapping to an output.
+			data - Numpy array: The data that the function will be mapping to an output.
 
 		Return:
-			output - type = Numpy array: The mapped data.
+			output - Numpy array: The mapped data.
 
 		"""
 
 		return np.where(data>=0, data, self.alpha*(np.exp(data)-1))
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def derivative(self, data):
+	def calculate_gradients(self, data):
 		"""
 		Calculates the derivative of the activation function.
 	
 		Arguments:
-			data - type = Numpy array: The data that the derivative will be calculate with respect to.
+			data - Numpy array: The data that the derivative will be calculate W.R.T.
 
 		Return:
-			output - type = Numpy array: The calculated derivative.
+			output - Numpy array: The calculated derivative.
 
 		"""
 
 		return np.where(data>=0, 1, self.alpha*np.exp(data))
+
+# ------------------------------------------------------------------------------------------------------------------------
+def get(activation):
+	"""
+	Finds and returns the correct activation class.
+
+	Arguments:
+		activation - str/instance of a class: The activation class.
+
+	Returns:
+		activation - instance of a class: The correct activation class.
+		
+	"""
+
+	if type(activation) == str:
+		if activation.lower() in ("linear"):
+			return Linear()
+		elif activation.lower() in ("softmax"):
+			return Softmax()
+		elif activation.lower() in ("sigmoid"):
+			return Sigmoid()
+		elif activation.lower() in ("tanh"):
+			return Tanh()
+		elif activation.lower() in ("relu"):
+			return ReLU()
+		elif activation.lower() in ("leaky_relu", "lrelu"):
+			return Leaky_ReLU()
+		elif activation.lower() in ("elu"):
+			return ELU()
+		else:
+			print("'%s' is not currently an available activation function. Has been set to 'Linear' by default" % activation)
+			return Linear()
+	else:
+		return activation
