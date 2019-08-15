@@ -5,7 +5,7 @@ class base_regularization(metaclass=ABCMeta):
 	@abstractmethod
 	def __init__(self):
 		"""
-		The regularization classes help prevent over fitting by adding a penalty to the vars.
+		The regularization classes help prevent over-fitting by adding a penalty to the vars.
 
 		"""
 
@@ -13,15 +13,15 @@ class base_regularization(metaclass=ABCMeta):
 
 	# ------------------------------------------------------------------------------------------------------------------------
 	@abstractmethod
-	def regularize(self, variables):
+	def map_data(self, variables):
 		"""
 		Takes some variables and calculates a penalty for them.
 
 		Arguments:
-			variables - type = Numpy array: A numpy array of the variables that will be regularized.
+			variables - Numpy array: A numpy array of the variables that will be regularized.
 
 		Returns:
-			output - type = Numpy array: The calculated penalties for the variables.
+			output - Numpy array: The calculated penalties for the variables.
 
 		"""
 
@@ -38,15 +38,15 @@ class L0:
 		self.name = "l0"
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def regularize(self, variables):
+	def map_data(self, variables):
 		"""
 		Takes some variables and calculates a penalty for them.
 
 		Arguments:
-			variables - type = Numpy array: A numpy array of the variables that will be regularized.
+			variables - Numpy array: A numpy array of the variables that will be regularized.
 
 		Returns:
-			output - type = Numpy array: The calculated penalties for the variables.
+			output - Numpy array: The calculated penalties for the variables.
 
 		"""
 
@@ -56,7 +56,7 @@ class L0:
 class L1:
 	def __init__(self, penalty=0.03):
 		"""
-		L1 is like L2 but sometimes the regularized variables can reach zero.
+		L1 trys to minimize the variables, and may cause the variables to go to 0.
 
 		"""
 
@@ -64,15 +64,15 @@ class L1:
 		self.name = "l1"
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def regularize(self, variables):
+	def map_data(self, variables):
 		"""
 		Takes some variables and calculates a penalty for them.
 
 		Arguments:
-			variables - type = Numpy array: A numpy array of the variables that will be regularized.
+			variables - Numpy array: A numpy array of the variables that will be regularized.
 
 		Returns:
-			output - type = Numpy array: The calculated penalties for the variables.
+			output - Numpy array: The calculated penalties for the variables.
 
 		"""
 
@@ -82,7 +82,7 @@ class L1:
 class L2:
 	def __init__(self, penalty=0.03):
 		"""
-		L2 is the most commonly used regularization technique out of all of them. L2 trys to minimalize the variables but never reaches zero.
+		L2 is the most commonly used regularization technique. L2 trys to minimize the variables but never reaches zero.
 	
 		"""
 
@@ -90,16 +90,42 @@ class L2:
 		self.name = "l2"
 
 	# ------------------------------------------------------------------------------------------------------------------------
-	def regularize(self, variables):
+	def map_data(self, variables):
 		"""
 		Takes some variables and calculates a penalty for them.
 
 		Arguments:
-			variables - type = Numpy array: A numpy array of the variables that will be regularized.
+			variables - Numpy array: A numpy array of the variables that will be regularized.
 
 		Returns:
-			output - type = Numpy array: The calculated penalties for the variables.
+			output - Numpy array: The calculated penalties for the variables.
 
 		"""
 
 		return self.penalty * variables
+
+# ------------------------------------------------------------------------------------------------------------------------
+def get(regularizer):
+	"""
+	Finds and returns the correct regularizer class.
+
+	Arguments:
+		regularizer - str/instance of a class: The regularization class.
+
+	Returns:
+		regularizer - instance of a class: The correct regularization class.
+		
+	"""
+
+	if type(regularizer) == str:
+		if regularizer.lower() in ("l0"):
+			return L0()
+		elif regularizer.lower() in ("l1"):
+			return L1()
+		elif regularizer.lower() in ("l2"):
+			return L2()
+		else:
+			print("'%s' is not currently an available regularizer. Has been set to 'L0' by default" % regularizer)
+			return L0()
+	else:
+		return regularizer
