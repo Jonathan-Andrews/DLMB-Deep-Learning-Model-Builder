@@ -2,13 +2,13 @@ import numpy as np
 
 def zeros(matrix_shape):
 	"""
-	Creates a matrix of shape matrix_shape filled with values of 0.
+	Creates a numpy array of shape matrix_shape filled with values of 0.
 
 	Arguments:
-		matrix_shape - type = tuple: A tuple with 2 numbers, specifying the number of rows and the number of columns.
+		matrix_shape - tuple: A tuple with 2 numbers, specifying size of the numpy array.
 
 	Returns:
-		output - type = Numpy array: A matrix filled with random values between 0 and 1.
+		output - Numpy array: A numpy array filled with values of 0.
 		
 	"""
 
@@ -17,13 +17,13 @@ def zeros(matrix_shape):
 # ------------------------------------------------------------------------------------------------------------------------
 def ones(matrix_shape):
 	"""
-	Creates a matrix of shape matrix_shape filled with values of 1.
+	Creates a numpy array of shape matrix_shape filled with values of 1.
 
 	Arguments:
-		matrix_shape - type = tuple: A tuple with 2 numbers, specifying the number of rows and the number of columns.
+		matrix_shape - tuple: A tuple with 2 numbers, specifying size of the numpy array.
 
 	Returns:
-		output - type = Numpy array: A matrix filled with random values between 0 and 1.
+		output - Numpy array: A numpy array filled with values of 1.
 		
 	"""
 
@@ -32,13 +32,13 @@ def ones(matrix_shape):
 # ------------------------------------------------------------------------------------------------------------------------
 def random(matrix_shape):
 	"""
-	Creates a matrix of shape matrix_shape filled with random values between 0 and 1.
+	Creates a numpy array of shape matrix_shape filled with random values between 0 and 1.
 
 	Arguments:
-		matrix_shape - type = tuple: A tuple with 2 numbers, specifying the number of rows and the number of columns.
+		matrix_shape - tuple: A tuple with 2 numbers, specifying size of the numpy array.
 
 	Returns:
-		output - type = Numpy array: A matrix filled with random values between 0 and 1.
+		output - Numpy array: A numpy array filled with random values between 0 and 1.
 		
 	"""
 
@@ -47,13 +47,13 @@ def random(matrix_shape):
 # ------------------------------------------------------------------------------------------------------------------------
 def uniform(matrix_shape):
 	"""
-	Creates a uniform matrix with boundaries of [-1/sqrt(n), 1/sqrt(n)].
+	Creates a uniform numpy array with boundaries of [-1/sqrt(n), 1/sqrt(n)].
 
 	Arguments:
-		matrix_shape - type = tuple: A tuple with 2 numbers, specifying the number of rows and the number of columns.
+		matrix_shape - tuple: A tuple with 2 numbers, specifying size of the numpy array.
 
 	Returns:
-		output - type = Numpy array: A uniform matrix.
+		output - Numpy array: A uniform numpy array.
 		
 	"""
 
@@ -63,13 +63,13 @@ def uniform(matrix_shape):
 # ------------------------------------------------------------------------------------------------------------------------
 def xavier(matrix_shape):
 	"""
-	Creates a gaussian distribution matrix with a mean of 0 and variance of sqrt(2/(n+m)) where n and m are the sizes of the matrix.
+	Creates a gaussian distribution numpy array with a mean of 0 and variance of sqrt(2/(n+m)).
 
 	Arguments:
-		matrix_shape - type = tuple: A tuple with 2 numbers, specifying the number of rows and the number of columns.
+		matrix_shape - tuple: A tuple with 2 numbers, specifying size of the numpy array.
 
 	Returns:
-		output - type = Numpy array: A gaussian distribution matrix.
+		output - Numpy array: A gaussian distribution numpy array.
 		
 	"""
 
@@ -78,13 +78,13 @@ def xavier(matrix_shape):
 # ------------------------------------------------------------------------------------------------------------------------
 def xavier_uniform(matrix_shape):
 	"""
-	Creates a uniform matrix based of the xavier initializer with boundaries of [-sqrt(6)/sqrt(n+m), sqrt(6)/sqrt(n+m)] where n and m are the sizes of the matrix.
+	Creates a uniform numpy array based of the xavier initializer with boundaries of [-sqrt(6)/sqrt(n+m), sqrt(6)/sqrt(n+m)].
 
 	Arguments:
-		matrix_shape - type = tuple: A tuple with 2 numbers, specifying the number of rows and the number of columns.
+		matrix_shape - tuple: A tuple with 2 numbers, specifying size of the numpy array.
 
 	Returns:
-		output - type = Numpy array: A uniform matrix.
+		output - Numpy array: A uniform numpy array.
 		
 	"""
 
@@ -94,13 +94,13 @@ def xavier_uniform(matrix_shape):
 # ------------------------------------------------------------------------------------------------------------------------
 def sigmoid_uniform(matrix_shape):
 	"""
-	Creates a uniform matrix based of the xavier_uniform initializer with boundaries of [-(4*sqrt(6))/sqrt(n+m), 4*sqrt(6)/sqrt(n+m)] where n and m are the sizes of the matrix.
+	Creates a uniform numpy array based of the xavier_uniform initializer with boundaries of [-(4*sqrt(6))/sqrt(n+m), 4*sqrt(6)/sqrt(n+m)].
 
 	Arguments:
-		matrix_shape - type = tuple: A tuple with 2 numbers, specifying the number of rows and the number of columns.
+		matrix_shape - tuple: A tuple with 2 numbers, specifying size of the numpy array.
 
 	Returns:
-		output - type = Numpy array: A uniform matrix.
+		output - Numpy array: A uniform numpy array.
 		
 	"""
 
@@ -110,13 +110,13 @@ def sigmoid_uniform(matrix_shape):
 # ------------------------------------------------------------------------------------------------------------------------
 def relu(matrix_shape):
 	"""
-	Creates a gaussian distribution matrix with a mean of 0 and variance of sqrt(2/m) where m is the number of rows
+	Creates a gaussian distribution numpy array with a mean of 0 and variance of sqrt(2/m).
 
 	Arguments:
-		matrix_shape - type = tuple: A tuple with 2 numbers, specifying the number of rows and the number of columns.
+		matrix_shape - tuple: A tuple with 2 numbers, specifying size of the numpy array.
 
 	Returns:
-		output - type = Numpy array: A gaussian distribution matrix.
+		output - Numpy array: A gaussian distribution numpy array.
 		
 	"""
 
@@ -125,15 +125,53 @@ def relu(matrix_shape):
 # ------------------------------------------------------------------------------------------------------------------------
 def relu_uniform(matrix_shape):
 	"""
-	Creates a uniform matrix based of the relu initializer with boundaries of [-sqrt(6/m), sqrt(6/m)] where m is the number of rows
+	Creates a uniform numpy array based of the relu initializer with boundaries of [-sqrt(6/m), sqrt(6/m)].
 
 	Arguments:
-		matrix_shape - type = tuple: A tuple with 2 numbers, specifying the number of rows and the number of columns.
+		matrix_shape - tuple: A tuple with 2 numbers, specifying size of the numpy array.
 
 	Returns:
-		output - type = Numpy array: A uniform matrix.
+		output - Numpy array: A uniform numpy array.
 		
 	"""
 
 	boundaries = np.sqrt(6/matrix_shape[0])
 	return np.random.uniform(-boundaries, boundaries, matrix_shape)
+
+# ------------------------------------------------------------------------------------------------------------------------
+def get(initializer):
+	"""
+	Finds and returns the correct initializer function.
+
+	Arguments:
+		initializer - str/instance of a function: The initializer function.
+
+	Returns:
+		initializer - instance of a function: The correct initializer function.
+		
+	"""
+
+	if type(initializer) == str:
+		if initializer.lower() in ("zeros", "zero"):
+			return zeros
+		elif initializer.lower() in ("ones", "one"):
+			return ones
+		elif initializer.lower() in ("random"):
+			return random
+		elif initializer.lower() in ("uniform"):
+			return uniform
+		elif initializer.lower() in ("xavier"):
+			return xavier
+		elif initializer.lower() in ("xavier_uniform"):
+			return xavier_uniform
+		elif initializer.lower() in ("sigmoid_uniform"):
+			return sigmoid_uniform
+		elif initializer.lower() in ("relu"):
+			return relu
+		elif initializer.lower() in ("relu_uniform"):
+			return relu_uniform
+		else:
+			print("'%s' is not currently an available initializer function. Has been set to 'random' by default" % initializer)
+			return random
+	else:
+		return initializer
