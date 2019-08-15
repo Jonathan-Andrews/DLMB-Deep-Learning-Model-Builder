@@ -1,6 +1,6 @@
 import json
 import numpy as np
-import layers as LA
+import layers import dense, batchnorm, dropout
 import losses as L
 import activations as A
 import optimizers as O
@@ -153,13 +153,13 @@ class Sequential:
 					try:
 						layer_data = model_layers[f"layer{index}"]
 						if layer_data["name"] == "Dense":
-							self.model.append(LA.dense.Dense(1))
+							self.model.append(dense.Dense(1))
 
 						elif layer_data["name"] == "Batchnorm":
-							self.model.append(LA.batchnorm.Batchnorm())
+							self.model.append(batchnorm.Batchnorm())
 
 						elif layer_data["name"] == "Dropout":
-							self.model.append(LA.dropout.Dropout())
+							self.model.append(dropout.Dropout())
 
 						self.model[-1].load(layer_data)
 
