@@ -7,11 +7,11 @@ class Dropout(Base_layer):
 		The Dropout class simplifies a neural-net model by randomly nulling some of the outputs from the previous layer.
 
 		Arguments:
-			keep_prob - type = float: A number between 0 and 1 that is a percentage of how many outputs to keep.
+			keep_prob - float: A number between 0 and 1 that is a percentage of how many outputs to keep.
 		
 		"""
 
-		self.layer_type = "Dropout"
+		self.name = "Dropout"
 		self.keep_prob = keep_prob
 
  	# ------------------------------------------------------------------------------------------------------------------------
@@ -23,17 +23,51 @@ class Dropout(Base_layer):
 
 		pass
 
+	# ------------------------------------------------------------------------------------------------------------------------
+	def get_summary(self, with_vars, *args):
+		"""
+		get_summary() returns a summary of the layers features.
+
+		Arguments:
+			with_vars - bool: If True, get_summary() includes the layer's variables' values in the summary.
+
+		Returns:
+			summary - dict: A dictonary of the layers features.
+
+		"""
+
+		summary = {
+					"name":self.name,
+					"keep_prob":self.keep_prob,
+					"num_trainable_vars":0
+				  }
+
+		return summary
+
+	# ------------------------------------------------------------------------------------------------------------------------
+	def load(self, layer_data, *args, **kwargs):
+		"""
+		Takes the layer_data from the model this layer belongs to and sets all vars equal to each key in layer_data.
+
+		Arguments:
+			layer_data - dict: A dictonary of saved vars from when this layer was first built and then saved.
+
+		"""
+
+		self.name = layer_data["name"]
+		self.keep_prob = layer_data["keep_prob"]
+
  	# ------------------------------------------------------------------------------------------------------------------------
 	def map_data(self, data):
 		"""
 		map_data() makes a mask and applies it to the incoming input, randomly nulling some of the outputs.
 
 		Arguments:
-			data - type = Numpy array: A matrix or vector (depending on batch size) containing real numbers passed from the previous layer.
+			data - Numpy array: A numpy array containing real numbers passed from the previous layer.
 
 		Returns:
-			output - type = Numpy array: A matrix or vector (depending on batch size) of outputs from this layer.
-
+			output - Numpy array: A numpy array of outputs from this layer.
+			
 		"""
 
 		self.mask = np.random.binomial(1, self.keep_prob, size=data.shape)/self.keep_prob
@@ -42,13 +76,13 @@ class Dropout(Base_layer):
     # ------------------------------------------------------------------------------------------------------------------------
 	def calculate_gradients(self, error):
 		"""
-		Calculates the error for this layer woth the error from the previous layer.
+		Calculates the error for this layer W.R.T the error from the previous layer.
 
 		Arguments:
-			error - type = Numpy array: A matrix or vector (depending on batch size) containing the error for the previous layer.
+			error - Numpy array: A numpy array containing the error for the previous layer.
 
 		Returns:
-			output - type = Numpy array: A matrix or vector (depending on batch size) containing the error for this layer.
+			output - Numpy array: A numpy array containing the error for this layer.
 
 		"""
 
@@ -60,8 +94,8 @@ class Dropout(Base_layer):
 		update_vars() is a function from the base_layer. This function can be passed because there are no vars to update.
 	
 		Arguments:
-			optimizer - type = Instance of a class: A class that takes each layer's gradients and optimizes them to reach a local optima in the error faster.
-			epoch - type = Int: The current epoch that the layer is training on.
+			optimizer - instance of a class: A class that takes each layer's gradients and optimizes them to reach a local optima in the error faster.
+			epoch - int: The current epoch that the layer is training on.
 
 		"""
 
