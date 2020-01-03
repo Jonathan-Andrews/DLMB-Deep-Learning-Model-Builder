@@ -60,13 +60,11 @@ def run():
 		# load the model and get its predictions based on x_test
 		nn_model = Sequential()
 		nn_model.load(file_path)
-		
-		nn_model.get_summary()
 
 		predictions = nn_model.predict(x_test)
 
 		# compare the predictions to the correct labels
-		# print(f"This model got a {validate_model(predictions, y_test)/100}% accuracy")
+		print(f"This model got a {validate_model(predictions, y_test)/100}% accuracy")
 
 
 	# If the file doesn't exist then we need to build a neural-net model and train it.
