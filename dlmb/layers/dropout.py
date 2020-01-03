@@ -1,102 +1,124 @@
-import numpy as np
-from layers.base_layer import Base_layer
+from layers.base_layer import *
+from utils.helpers import *
 
-class Dropout(Base_layer):
-	def __init__(self, keep_prob=0.5):
+
+class Dropout(Base_Layer):
+	@accepts(self="any", keep_prob=float)
+	def __init__(self, keep_prob=0.5) -> None:
 		"""
-		The Dropout class simplifies a neural-net model by randomly nulling some of the outputs from the previous layer.
+			Dropout is a type of regularization that creates a mask or probabilities.
+			This mask will then be applied to any incoming input, 
+			in effect cancelling a certain percentage of the input.
 
-		Arguments:
-			keep_prob - float: A number between 0 and 1 that is a percentage of how many outputs to keep.
-		
+			Arguments:
+				keep_prob : float : The probability that each feature along each row of the input will be kept.
+
 		"""
 
-		self.name = "Dropout"
+		super().__init__("Dropout")
+
 		self.keep_prob = keep_prob
+		self.built = False
 
- 	# ------------------------------------------------------------------------------------------------------------------------
-	def set_vars(self):
+
+	def build(self) -> None:
+		self.built = True
+
+
+	@accepts(self="any", with_vars=bool)
+	def get_summary(self, with_vars) -> dict:
 		"""
-		set_vars() is a function from the base_layer. This function can be passed because there are no vars to set up.
+			get_summary() returns a summary of the layers features.
 
-		"""
+			Arguments:
+				with_vars : bool : If True, get_summary() includes the layer's variables' values in the summary.
 
-		pass
-
-	# ------------------------------------------------------------------------------------------------------------------------
-	def get_summary(self, with_vars, *args):
-		"""
-		get_summary() returns a summary of the layers features.
-
-		Arguments:
-			with_vars - bool: If True, get_summary() includes the layer's variables' values in the summary.
-
-		Returns:
-			summary - dict: A dictonary of the layers features.
+			Returns:
+				summary : dict : A dictonary of the layers features.
 
 		"""
 
 		summary = {
 					"name":self.name,
-					"keep_prob":self.keep_prob,
-					"num_trainable_vars":0
+					"built":self.built,
+					"keep_prob":self.keep_prob
 				  }
 
 		return summary
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def load(self, layer_data, *args, **kwargs):
-		"""
-		Takes the layer_data from the model this layer belongs to and sets all vars equal to each key in layer_data.
 
-		Arguments:
-			layer_data - dict: A dictonary of saved vars from when this layer was first built and then saved.
+	@accepts(self="any", layer_data=dict)
+	def load(self, layer_data) -> None:
+		"""
+			Takes the layer_data from the model this layer belongs to, and sets all vars equal to each key in layer_data.
+
+			Arguments:
+				layer_data : dict : A dictonary of saved vars from when this layer was first built and then saved.
 
 		"""
 
 		self.name = layer_data["name"]
+		self.built = layer_data["built"]
 		self.keep_prob = layer_data["keep_prob"]
 
- 	# ------------------------------------------------------------------------------------------------------------------------
-	def map_data(self, data):
+
+	@accepts(self="any", data=np.ndarray)
+	def map_data(self, data) -> np.ndarray:
 		"""
-		map_data() makes a mask and applies it to the incoming input, randomly nulling some of the outputs.
+			Applies a mask to some data in the form of (x * ([...] < keep_prop))/keep_prob.
 
-		Arguments:
-			data - Numpy array: A numpy array containing real numbers passed from the previous layer.
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array containing real numbers passed from the previous layer.
 
-		Returns:
-			output - Numpy array: A numpy array of outputs from this layer.
-			
-		"""
-
-		self.mask = np.random.binomial(1, self.keep_prob, size=data.shape)/self.keep_prob
-		return data*self.mask
-    
-    # ------------------------------------------------------------------------------------------------------------------------
-	def calculate_gradients(self, error):
-		"""
-		Calculates the error for this layer W.R.T the error from the previous layer.
-
-		Arguments:
-			error - Numpy array: A numpy array containing the error for the previous layer.
-
-		Returns:
-			output - Numpy array: A numpy array containing the error for this layer.
+			Returns:
+				output : np.ndarray : An n dimensional numpy array of outputs from this layer.
 
 		"""
 
-		return error*self.mask
+		data_shape = data.shape
 
- 	# ------------------------------------------------------------------------------------------------------------------------
-	def update_vars(self, optimizer, epoch):
+		# Try to write a decorator for this.
+		# Makes sure that the data is a 2d np.ndarray.
+		if len(data.shape) == 1:
+			data = data.reshape((1, data.shape[0]))
+		elif len(data.shape) > 1:
+			length = 1
+			for i in range(len(data.shape)-1):
+				length *= data.shape[i+1]
+			data = data.reshape((data.shape[0], length))
+
+		self.mask = np.random.random(data.shape) < self.keep_prob
+		return np.reshape((data*self.mask)/self.keep_prob, data_shape)
+
+
+	@accepts(self="any", error=np.ndarray)
+	def calculate_gradients(self, error) -> np.ndarray:
 		"""
-		update_vars() is a function from the base_layer. This function can be passed because there are no vars to update.
-	
-		Arguments:
-			optimizer - instance of a class: A class that takes each layer's gradients and optimizes them to reach a local optima in the error faster.
-			epoch - int: The current epoch that the layer is training on.
+			Calculates the gradients of the error W.R.T to the input of this layer.
+
+			Arguments:
+				error : np.ndarray : An n dimensional numpy array containing the errors for the previous layer.
+
+			Returns:
+				output : np.ndarray : An n dimensional numpy array containing the errors for this layer.
 
 		"""
 
+		error_shape = error.shape
+
+		# Makes sure that the error is a 2d np.ndarray.
+		if len(error.shape) == 1:
+			error = error.reshape((1, error.shape[0]))
+		elif len(error.shape) > 1:
+			length = 1
+			for i in range(len(error.shape)-1):
+				length *= error.shape[i+1]
+			error = error.reshape((error.shape[0], length))
+
+
+		return np.reshape((error*self.mask)/self.keep_prob, error_shape)
+
+
+	@accepts(self="any", optimizer=op.Base_Optimizer, epoch=int)
+	def update_vars(self, optimizer, epoch) -> None:
 		pass
