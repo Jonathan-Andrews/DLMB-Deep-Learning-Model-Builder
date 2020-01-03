@@ -1,5 +1,6 @@
 import json
 import numpy as np
+import copy
 
 from utils.helpers import *
 
@@ -161,17 +162,10 @@ class Sequential:
 
 				for i in range(len(model_layers)):
 					layer_data = model_layers["layer: %s" % i]
-					self.model.append(layers[layer_data["name"]])
-					self.model[i].load(layer_data)
-
-					for layer in self.model:
-						print(layer.layer_shape)
-					print("")
-					print("")
-					print("")
-
-				# for layer in self.model:
-					# print(layer.layer_shape)
+					
+					new_layer = copy.copy(layers[layer_data["name"]])
+					new_layer.load(layer_data)
+					self.model.append(new_layer)
 
 
 		# Gets called if the program can't find the file_path.
