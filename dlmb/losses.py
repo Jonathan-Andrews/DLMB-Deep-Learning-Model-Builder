@@ -1,199 +1,227 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
 
-# ------------------------------------------------------------------------------------------------------------------------
-class Base_loss(metaclass=ABCMeta):
+from utils.helpers import *
+
+
+class Base_Loss(metaclass=ABCMeta):
 	@abstractmethod
-	def __init__(self):
+	def __init__(self) -> None:
 		"""
-		The Base_loss class is an abstract class and makes sure every loss function uses the functions down below.
+			The Base_Loss class is an abstract class for all loss functions. 
+			All loss functions must inherit from Base_Loss.
 
 		"""
 
 		pass
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	@abstractmethod
-	def map_data(self, data):
-		"""
-		This is where the math happens, the function takes some data and applies a mathematical mapping to it.
 	
-		Arguments:
-			data - Numpy array: The data that the function will be mapping to an output.
+	@abstractmethod
+	def map_data(self, y_true:np.ndarray, y_pred:np.ndarray) -> np.ndarray:
+		"""
+			map_data() takes some data and applies a mathematical mapping to it.
+		
+			Arguments:
+				y_true : np.ndarray : An n dimensional numpy array of target values for the output of a neural-net model.
+				y_pred : np.ndarray : An n dimensional numpy array of predicted values from a neural-net model.
 
-		Return:
-			output - Numpy array: The mapped data.
+
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the mapped data.
 
 		"""
 
 		return output
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	@abstractmethod
-	def calculate_gradients(self, data):
-		"""
-		Calculates the derivative of the loss function.
-	
-		Arguments:
-			data - Numpy array: The data that the derivatives will be calculated W.R.T.
 
-		Return:
-			output - Numpy array: The calculated derivatives.
+	@abstractmethod
+	def calculate_gradients(self, y_true:np.ndarray, y_pred:np.ndarray) -> np.ndarray:
+		"""
+			calculate_gradients returns the derivative of the loss function W.R.T the data.
+	
+			Arguments:
+				y_true : np.ndarray : An n dimensional numpy array of target values for the output of a neural-net model.
+				y_pred : np.ndarray : An n dimensional numpy array of predicted values from a neural-net model.
+
+
+			Return:
+				output : np.ndarray : An n dimensional numpy array of gradients.
 
 		"""
 
 		return output
 
-# ------------------------------------------------------------------------------------------------------------------------
-class Mean_squared_error(Base_loss):
-	def __init__(self):
+
+
+
+
+class Mean_Squared_Error(Base_Loss):
+	def __init__(self) -> None:
 		"""
-		The MSE class is a commonly used regression loss function. MSE is the mean squared distances between the target values and predicted values.
+			The MSE class is a commonly used regression loss function. 
 
 		"""
 
 		pass
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def map_data(self, y_pred, y_true):
+
+	@accepts(self="any", y_true=np.ndarray, y_pred=np.ndarray)
+	def map_data(self, y_true, y_pred) -> np.ndarray:
 		"""
 		Calculates the squared distance between y_true and y_pred.
 
 		Arguments:
-			y_pred - Numpy array: A numpy array of predicted values from the model.
-			y_true - Numpy array: A numpy array of target values for the output.
+			y_true : np.ndarray : An n dimensional numpy array of target values for the output of a neural-net model.
+			y_pred : np.ndarray : An n dimensional numpy array of predicted values from a neural-net model.
 
 		Returns:
-			output - Numpy array: The calculated mean squared distance between y_true and y_pred.
+			output : np.ndarray : An n dimensional numpy array of the mean squared distance between y_true and y_pred.
 
 		"""
 
-		return 2**(y_pred - y_true)/2
+		return (y_pred-y_true)**2/2
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def calculate_gradients(self, y_pred, y_true):
+
+	@accepts(self="any", y_true=np.ndarray, y_pred=np.ndarray)
+	def calculate_gradients(self, y_true, y_pred) -> np.ndarray:
 		"""
 		Calculates the derivatives of the function W.R.T y_pred.
 
 		Arguments:
-			y_pred - Numpy array: A numpy array of predicted values from the model.
-			y_true - Numpy array: A numpy array of target values for the output.
+			y_true : np.ndarray : An n dimensional numpy array of target values for the output of a neural-net model.
+			y_pred : np.ndarray : An n dimensional numpy array of predicted values from a neural-net model.
 
 		Returns:
-			output - Numpy array: The calculated derivatives of the function with respect to y_pred.
+			output : np.ndarray : An n dimensional numpy array of the calculated derivatives of the function W.R.T y_pred.
 
 		"""
 
 		return y_pred - y_true
 
-# ------------------------------------------------------------------------------------------------------------------------
-class Binary_crossentropy(Base_loss):
-	def __init__(self):
+
+
+
+
+class Binary_Crossentropy(Base_Loss):
+	def __init__(self) -> None:
 		"""
-		The Binary_crossentropy class measures the performance of a classification model whose output is a probability value between 0 and 1, 
-		and where the number of outputs is less than 3.
-
-		"""
-
-		pass
-
-	# ------------------------------------------------------------------------------------------------------------------------
-	def map_data(self, y_pred, y_true):
-		"""
-		Calculates the distance between y_true and y_pred.
-
-		Arguments:
-			y_pred - Numpy array: A numpy array of predicted values from the model.
-			y_true - Numpy array: A numpy array of target values for the output.
-
-		Returns:
-			output - Numpy array: The calculated distance between y_true and y_pred.
-
-		"""
-
-		return -1 * (y_true * np.log(y_pred+1.0e-8) + (1-y_true) * np.log(1-y_pred+1.0e-8))
-
-	# ------------------------------------------------------------------------------------------------------------------------
-	def calculate_gradients(self, y_pred, y_true):
-		"""
-		Calculates the derivatives of the function W.R.T y_pred.
-
-		Arguments:
-			y_pred - Numpy array: A numpy array of predicted values from the model.
-			y_true - Numpy array: A numpy array of target values for the output.
-
-		Returns:
-			output - Numpy array: The calculated derivatives of the function with respect to y_pred.
-
-		"""
-
-		return -1 * ((y_true-y_pred) / (y_pred*(-y_pred+1))+1.0e-8)
-
-# ------------------------------------------------------------------------------------------------------------------------
-class Crossentropy(Base_loss):
-	def __init__(self):
-		"""
-		The Crossentropy class measures the performance of a classification model whose output is a probability value between 0 and 1, 
-		and where the number of outputs is more than 2.
+			The Binary_crossentropy class measures the performance of a classification model whose output is a probability value between 0 and 1, 
+			and where the number of outputs is less than 3.
 
 		"""
 
 		pass
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def map_data(self, y_pred, y_true):
+
+	@accepts(self="any", y_true=np.ndarray, y_pred=np.ndarray)
+	def map_data(self, y_true, y_pred) -> np.ndarray:
 		"""
-		Calculates the distance between y_true and y_pred.
+			Calculates the distance between y_true and y_pred.
+	
+			Arguments:
+				y_true : np.ndarray : An n dimensional numpy array of target values for the output of a neural-net model.
+				y_pred : np.ndarray : An n dimensional numpy array of predicted values from a neural-net model.
 
-		Arguments:
-			y_pred - Numpy array: A numpy array of predicted values from the model.
-			y_true - Numpy array: A numpy array of target values for the output.
-
-		Returns:
-			output - Numpy array: The calculated distance between y_true and y_pred.
+			Returns:
+				output : np.ndarray : The mean squared distance between y_true and y_pred.
 
 		"""
 
-		return -1 * (y_true*np.log(y_pred+1.0e-8))
+		part1 = y_true*np.log(y_pred+1.0e-8) # I add 1.0e-8 to make sure 0 isn't going into np.log
+		part2 = (1-y_true)*np.log(1-y_pred+1.0e-8)
+		return -(part1 + part2)
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def calculate_gradients(self, y_pred, y_true):
+
+	@accepts(self="any", y_true=np.ndarray, y_pred=np.ndarray)
+	def calculate_gradients(self, y_true, y_pred) -> np.ndarray:
+		"""
+			Calculates the derivatives of the function W.R.T y_pred.
+
+			Arguments:
+				y_true : np.ndarray : An n dimensional numpy array of target values for the output of a neural-net model.
+				y_pred : np.ndarray : An n dimensional numpy array of predicted values from a neural-net model.
+
+			Returns:
+				output : np.ndarray : An n dimensional numpy array of the calculated derivatives of the function W.R.T y_pred.
+
+		"""
+
+		return division_check(y_true,y_pred) - division_check(1-y_true, 1-y_pred)
+
+
+
+
+
+class Crossentropy(Base_Loss):
+	def __init__(self) -> None:
+		"""
+			The Crossentropy class measures the performance of a classification model whose output is a probability value between 0 and 1, 
+			and where the number of outputs is more than 2.
+
+		"""
+
+		pass
+
+
+	@accepts(self="any", y_true=np.ndarray, y_pred=np.ndarray)
+	def map_data(self, y_true, y_pred) -> np.ndarray:
+		"""
+			Calculates the distance between y_true and y_pred.
+
+			Arguments:
+				y_true : np.ndarray : An n dimensional numpy array of target values for the output of a neural-net model.
+				y_pred : np.ndarray : An n dimensional numpy array of predicted values from a neural-net model.
+
+			Returns:
+				output : np.ndarray : The mean squared distance between y_true and y_pred.
+
+		"""
+
+		return -(y_true*np.log(y_pred+1.0e-8))
+
+
+	def calculate_gradients(self, y_pred:np.ndarray, y_true:np.ndarray) -> np.ndarray:
 		"""
 		Calculates the derivatives of the function W.R.T y_pred.
 
 		Arguments:
-			y_pred - Numpy array: A numpy array of predicted values from the model.
-			y_true - Numpy array: A numpy array of target values for the output.
+			y_true : np.ndarray : An n dimensional numpy array of target values for the output of a neural-net model.
+			y_pred : np.ndarray : An n dimensional numpy array of predicted values from a neural-net model.
 
 		Returns:
-			output - Numpy array: The calculated derivatives of the function with respect to y_pred.
+			output : np.ndarray : An n dimensional numpy array of the calculated derivatives of the function W.R.T y_pred.
 
 		"""
 
-		return -1 * (y_true/(y_pred+1.0e-8))
+		return division_check(y_true, y_pred)
 
-# ------------------------------------------------------------------------------------------------------------------------
-def get(loss):
+
+
+
+
+def get(loss) -> Base_Loss:
 	"""
-	Finds and returns the correct loss class.
+		Finds and returns the correct loss function.
 
-	Arguments:
-		loss - str/instance of a class: The loss class.
+		Arguments:
+			loss : Base_Loss/str : The loss function the user wants to use.
 
-	Returns:
-		loss - instance of a class: The correct loss class.
+		Returns:
+			loss : Base_Loss : The correct loss function.
 		
 	"""
 
-	if type(loss) == str:
+	if isinstance(loss, str):
 		if loss.lower() in ("mse", "mean_squared_error"):
-			return Mean_squared_error()
-		elif loss.lower() in ("bc", "binary_crossentropy"):
-			return Binary_crossentropy()
+			return Mean_Squared_Error()
+		elif loss.lower() in ("bc", "bce", "binary_crossentropy"):
+			return Binary_Crossentropy()
 		elif loss.lower() in ("ce", "crossentropy"):
 			return Crossentropy()
 		else:
-			print("'%s' is not currently an available loss function. Has been set to 'Mean_squared_error' by default" % loss)
-			return MSE()
-	else:
+			print("At losses.get(): '%s' is not an available loss function. Has been set to 'Mean_squared_error' by default" % loss)
+			return Mean_squared_error()
+	elif isinstance(loss, Base_Loss):
 		return loss
+	else:
+		raise ValueError("At losses.get(): Expected 'class inheriting from Base_Loss' or 'str' for the argument 'loss', recieved '%s'" % type(loss))
