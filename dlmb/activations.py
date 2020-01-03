@@ -1,124 +1,141 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
 
-class Base_activation(metaclass=ABCMeta):
+from utils.helpers import *
+
+
+class Base_Activation(metaclass=ABCMeta):
 	@abstractmethod
-	def __init__(self):
+	def __init__(self) -> None:
 		"""
-		The Base_activation class is an abstract class and makes sure every activation function uses the functions down below.
+			The Base_Activation class is an abstract class for all activation functions. 
+			All activation functions must inherit from Base_Activation.
 
 		"""
 
-		pass
+		self.name = "Base_Activation"
 
-	# ------------------------------------------------------------------------------------------------------------------------
+
+
 	@abstractmethod
-	def map_data(self, data):
+	def map_data(self, data) -> np.ndarray:
 		"""
-		This is where the math happens. The function takes some data and applies a mathematical mapping to it.
+			map_data() takes some data and applies a mathematical mapping to it.
 	
-		Arguments:
-			data - Numpy array: The data that the function will be mapping to an output.
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array of data that the function will be mapping to an output.
 
-		Return:
-			output - Numpy array: The mapped data.
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the mapped data.
 
 		"""
 
 		return output
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	@abstractmethod
-	def calculate_gradients(self, data):
-		"""
-		Calculates the derivative of the activation function.
 	
-		Arguments:
-			data - Numpy array: The data that the derivative will be calculate W.R.T.
+	
+	@abstractmethod
+	def calculate_gradients(self, data) -> np.ndarray:
+		"""
+			Calculates the derivative of the activation function.
+		
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array of data that the derivative will be calculated W.R.T.
 
-		Return:
-			output - Numpy array: The calculated derivative.
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the calculated derivative.
 
 		"""
 
 		return output
 
-# ------------------------------------------------------------------------------------------------------------------------
-class Linear(Base_activation):
-	def __init__(self):
+
+
+
+
+class Linear(Base_Activation):
+	def __init__(self) -> None:
 		"""
-		The Linear class is the default activation function and generally isn't actually used.
+			The Linear class is the default activation function and generally isn't actually used.
 
 		"""
 
 		self.name = "linear"
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def map_data(self, data):
+
+	@accepts(self="any", data=np.ndarray)	
+	def map_data(self, data) -> np.ndarray:
 		"""
-		Maps some data to an output with the form of f(x) = x.
+			Maps some data to an output with the form of f(x) = x.
 
-		Arguments:
-			data - Numpy array: The data that the function will be mapping to an output.
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array of data that the function will be mapping to an output.
 
-		Return:
-			output - Numpy array: The mapped data.
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the mapped data.
 
 		"""
 
 		return data
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def calculate_gradients(self, data):
-		"""
-		Calculates the derivative of the activation function.
 	
-		Arguments:
-			data - Numpy array: The data that the derivative will be calculate W.R.T.
+	@accepts(self="any", data=np.ndarray)
+	def calculate_gradients(self, data) -> np.ndarray:
+		"""
+			Calculates the derivative of the activation function.
+		
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array of data that the derivative will be calculated W.R.T.
 
-		Return:
-			output - Numpy array: The calculated derivative.
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the calculated derivative.
 
 		"""
 
-		return np.array([[1]])
+		return np.ones_like(data)
 
-# ------------------------------------------------------------------------------------------------------------------------
-class Softmax(Base_activation):
-	def __init__(self):
+
+
+
+
+class Softmax(Base_Activation):
+	def __init__(self) -> None:
 		"""
-		The Softmax class takes an array and normalizes it into a probability distribution with the same size. Generally used for the output layer.
+			The Softmax class takes an array and normalizes it into a probability distribution with the same size.
+			Generally used for the output layer.
 
 		"""
 
 		self.name = "softmax"
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def map_data(self, data):
+
+	@accepts(self="any", data=np.ndarray)	
+	def map_data(self, data) -> np.ndarray:
 		"""
-		Maps some data to an output with the form of f(x) = e^x_k / sum(e^x_i).
+			Maps some data to an output with the form of f(x) = e^x_k / sum(e^x_i).
 
-		Arguments:
-			data - Numpy array: The data that the function will be mapping to an output.
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array of data that the function will be mapping to an output.
 
-		Return:
-			output - Numpy array: The mapped data.
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the mapped data.
 
 		"""
 
 		e_x = np.exp(data-np.max(data))
-		return e_x/(np.sum(e_x, axis=1, keepdims=True)+1.0e-8)
+		return division_check(e_x, np.sum(e_x, axis=1, keepdims=True))
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def calculate_gradients(self, data):
-		"""
-		Calculates the derivative of the activation function.
 	
-		Arguments:
-			data - Numpy array: The data that the derivative will be calculate W.R.T.
+	@accepts(self="any", data=np.ndarray)
+	def calculate_gradients(self, data) -> np.ndarray:
+		"""
+			Calculates the derivative of the activation function.
+		
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array of data that the derivative will be calculated W.R.T.
 
-		Return:
-			output - Numpy array: The calculated derivative.
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the calculated derivative.
 
 		"""
 
@@ -127,224 +144,260 @@ class Softmax(Base_activation):
 		i = np.identity(a.shape[1])
 		return (a*e.T) * (i - e*a.reshape((a.shape[0], a.shape[2], a.shape[1])))
 
-# ------------------------------------------------------------------------------------------------------------------------
-class Sigmoid(Base_activation):
-	def __init__(self):
+
+
+
+
+class Sigmoid(Base_Activation):
+	def __init__(self) -> None:
 		"""
-		The Sigmoid class squashes some data between 0 and 1. Good for probabilities and generally used for any layer.
+			The Sigmoid class squashes some data between a range of 0 and 1. 
+			Good for probabilities and generally used for any layer.
 
 		"""
 
 		self.name = "sigmoid"
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def map_data(self, data):
+
+	@accepts(self="any", data=np.ndarray)	
+	def map_data(self, data) -> np.ndarray:
 		"""
-		Maps some data to an output with the form of f(x) = 1/(1+e^-x).
+			Maps some data to an output with the form of f(x) = 1/(1+e^-x).
 
-		Arguments:
-			data - Numpy array: The data that the function will be mapping to an output.
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array of data that the function will be mapping to an output.
 
-		Return:
-			output - Numpy array: The mapped data.
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the mapped data.
 
 		"""
 
-		return 1/(1+np.exp(-data))
+		return division_check(1, 1+np.exp(-data))
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def calculate_gradients(self, data):
-		"""
-		Calculates the derivative of the activation function.
 	
-		Arguments:
-			data - Numpy array: The data that the derivative will be calculate W.R.T.
+	@accepts(self="any", data=np.ndarray)
+	def calculate_gradients(self, data) -> np.ndarray:
+		"""
+			Calculates the derivative of the activation function.
+		
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array of data that the derivative will be calculated W.R.T.
 
-		Return:
-			output - Numpy array: The calculated derivative.
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the calculated derivative.
 
 		"""
 
 		return self.map_data(data) * (1-self.map_data(data))
 
-# ------------------------------------------------------------------------------------------------------------------------
-class Tanh(Base_activation):
-	def __init__(self):
+
+
+
+
+class Tanh(Base_Activation):
+	def __init__(self) -> None:
 		"""
-		The Tanh class is the hyperbolic tangent function. Squashes some data between -1 and 1.
+			The Tanh class is the hyperbolic tangent function. 
+			Squashes some data between a range of -1 and 1.
 
 		"""
 
 		self.name = "tanh"
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def map_data(self, data):
+
+	@accepts(self="any", data=np.ndarray)	
+	def map_data(self, data) -> np.ndarray:
 		"""
-		Maps some data to an output with the form of f(x) = sinh(x)/cosh(x).
+			Maps some data to an output with the form of f(x) = sinh(x)/cosh(x).
 
-		Arguments:
-			data - Numpy array: The data that the function will be mapping to an output.
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array of data that the function will be mapping to an output.
 
-		Return:
-			output - Numpy array: The mapped data.
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the mapped data.
 
 		"""
 
-		return np.tanh(data)
+		return np.tanh(data) # Numpy already has a tahn function.
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def calculate_gradients(self, data):
-		"""
-		Calculates the derivative of the activation function.
 	
-		Arguments:
-			data - Numpy array: The data that the derivative will be calculate W.R.T.
+	@accepts(self="any", data=np.ndarray)
+	def calculate_gradients(self, data) -> np.ndarray:
+		"""
+			Calculates the derivative of the activation function.
+		
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array of data that the derivative will be calculated W.R.T.
 
-		Return:
-			output - Numpy array: The calculated derivative.
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the calculated derivative.
 
 		"""
 
 		return 1-self.map_data(data)**2
 
-# ------------------------------------------------------------------------------------------------------------------------
-class ReLU(Base_activation):
-	def __init__(self):
+
+
+
+
+class ReLU(Base_Activation):
+	def __init__(self) -> None:
 		"""
-		The ReLU class is the Rectified Linear Unit function. Commonly used for hidden layers.
+			The ReLU class is the Rectified Linear Unit function. 
+			Commonly used for hidden layers.
 
 		"""
 
 		self.name = "relu"
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def map_data(self, data):
+
+	@accepts(self="any", data=np.ndarray)	
+	def map_data(self, data) -> np.ndarray:
 		"""
-		Maps some data to an output with the form of f(x) = max(x, 0).
+			Maps some data to an output with the form of f(x) = max(x, 0).
 
-		Arguments:
-			data - Numpy array: The data that the function will be mapping to an output.
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array of data that the function will be mapping to an output.
 
-		Return:
-			output - Numpy array: The mapped data.
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the mapped data.
 
 		"""
 
 		return np.where(data>=0, data, 0)
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def calculate_gradients(self, data):
-		"""
-		Calculates the derivative of the activation function.
-	
-		Arguments:
-			data - Numpy array: The data that the derivative will be calculate W.R.T.
 
-		Return:
-			output - Numpy array: The calculated derivative.
+	@accepts(self="any", data=np.ndarray)
+	def calculate_gradients(self, data) -> np.ndarray:
+		"""
+			Calculates the derivative of the activation function.
+		
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array of data that the derivative will be calculated W.R.T.
+
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the calculated derivative.
 
 		"""
 
 		return np.where(data>=0, 1, 0)
 
-# ------------------------------------------------------------------------------------------------------------------------
-class Leaky_ReLU(Base_activation):
-	def __init__(self, alpha=1.0e-1):
+
+
+
+
+class Leaky_ReLU(Base_Activation):
+	@accepts(self="any", alpha=float)
+	def __init__(self, alpha=1.0e-1) -> None:
 		"""
-		The Leaky_ReLU class is a suggested improved version of the ReLU function. Commonly used for hidden layers.
-		
-		Arguments:
-			alpha - float: A small number which adds some flow for the data if it's less than zero, fixes the dying ReLU problem.
+			The Leaky_ReLU class is a suggested improvement of the ReLU function. 
+			Commonly used for hidden layers.
+			
+			Arguments:
+				alpha : float : Allows for flow of the data if it's less than zero, fixes the dying ReLU problem.
 
 		"""
 
 		self.alpha = alpha
 		self.name = "leaky_relu"
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def map_data(self, data):
+
+	@accepts(self="any", data=np.ndarray)	
+	def map_data(self, data) -> np.ndarray:
 		"""
-		Maps some data to an output with the form of f(x) = max(x, alpha*x).
+			Maps some data to an output with the form of f(x) = max(x, alpha*x).
 
-		Arguments:
-			data - Numpy array: The data that the function will be mapping to an output.
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array of data that the function will be mapping to an output.
 
-		Return:
-			output - Numpy array: The mapped data.
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the mapped data.
 
 		"""
 
-		return np.where(data>=0, data, alpha*data)
+		return np.where(data>=0, data, self.alpha*data)
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def calculate_gradients(self, data):
-		"""
-		Calculates the derivative of the activation function.
 	
-		Arguments:
-			data - Numpy array: The data that the derivative will be calculate W.R.T.
-
-		Return:
-			output - Numpy array: The calculated derivative.
-
+	@accepts(self="any", data=np.ndarray)
+	def calculate_gradients(self, data) -> np.ndarray:
 		"""
-
-		return np.where(data>=0, 1, alpha)
-
-# ------------------------------------------------------------------------------------------------------------------------
-class ELU(Base_activation):
-	def __init__(self, alpha=1.0e-1):
-		"""
-		The ELU class is a suggested improved version of the ReLU function. Commonly used for hidden layers.
+			Calculates the derivative of the activation function.
 		
-		Arguments:
-			alpha - float: A small number which adds some flow for the data if it's less than zero, fixes the dying ReLU problem.
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array of data that the derivative will be calculated W.R.T.
+
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the calculated derivative.
+
+		"""
+
+		return np.where(data>=0, 1, self.alpha)
+
+
+
+
+
+class ELU(Base_Activation):
+	@accepts(self="any", alpha=float)
+	def __init__(self, alpha=1.0e-1) -> None:
+		"""
+			The ELU class is a suggested improvement of the ReLU function. 
+			Commonly used for hidden layers.
+			
+			Arguments:
+				alpha : float : Allows for flow of the data if it's less than zero, fixes the dying ReLU problem.
 
 		"""
 
 		self.alpha = alpha
 		self.name = "elu"
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def map_data(self, data):
+
+	@accepts(self="any", data=np.ndarray)
+	def map_data(self, data) -> np.ndarray:
 		"""
-		Maps some data to an output with the form of f(x) = max(x, alpha*(e^x - 1)).
+			Maps some data to an output with the form of f(x) = max(x, alpha*(e^x - 1)).
 
-		Arguments:
-			data - Numpy array: The data that the function will be mapping to an output.
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array of data that the function will be mapping to an output.
 
-		Return:
-			output - Numpy array: The mapped data.
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the mapped data.
 
 		"""
 
 		return np.where(data>=0, data, self.alpha*(np.exp(data)-1))
 
-	# ------------------------------------------------------------------------------------------------------------------------
-	def calculate_gradients(self, data):
-		"""
-		Calculates the derivative of the activation function.
 	
-		Arguments:
-			data - Numpy array: The data that the derivative will be calculate W.R.T.
+	@accepts(self="any", data=np.ndarray)
+	def calculate_gradients(self, data) -> np.ndarray:
+		"""
+			Calculates the derivative of the activation function.
+		
+			Arguments:
+				data : np.ndarray : An n dimensional numpy array of data that the derivative will be calculated W.R.T.
 
-		Return:
-			output - Numpy array: The calculated derivative.
+			Return:
+				output : np.ndarray : An n dimensional numpy array of the calculated derivative.
 
 		"""
 
 		return np.where(data>=0, 1, self.alpha*np.exp(data))
 
-# ------------------------------------------------------------------------------------------------------------------------
-def get(activation):
+
+
+
+
+@accepts(activation=(Base_Activation, str))
+def get(activation) -> Base_Activation:
 	"""
-	Finds and returns the correct activation class.
+		Finds and returns the correct activation function.
 
-	Arguments:
-		activation - str/instance of a class: The activation class.
+		Arguments:
+			activation : Base_Activation/str : The activation function the user wants to use.
 
-	Returns:
-		activation - instance of a class: The correct activation class.
+		Returns:
+			activation : Base_Activation : The correct optimization function.
 		
 	"""
 
@@ -364,7 +417,9 @@ def get(activation):
 		elif activation.lower() in ("elu"):
 			return ELU()
 		else:
-			print("'%s' is not currently an available activation function. Has been set to 'Linear' by default" % activation)
+			print("At activations.get(): '%s' is not an available activation function. Has been set to 'Linear' by default" % activation)
 			return Linear()
-	else:
+	elif isinstance(activation, Base_Activation):
 		return activation
+	else:
+		raise ValueError("At activations.get(): Expected 'class inheriting from Base_Activation' or 'str' for the argument 'activation', recieved '%s'" % type(activation))
