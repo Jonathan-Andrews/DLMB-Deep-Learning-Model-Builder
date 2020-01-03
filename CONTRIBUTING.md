@@ -7,7 +7,7 @@ and that any spelling changes be kept to British English spelling.
 Some of the design decisions in this code might not be the most pythonic 
 (i.e creating a wrapper to check the data types of the arguments being passed to the function).
 The reason for these decisions is that I feel it makes the code more readable and prone to less errors.
-However, if you really feel that these choices should be changed then you can email me at 324MrL324@gmail.com about your ideas.
+However, if you really feel that these choices should be changed then you can email me at dlmb.submissions@gmail.com about your ideas.
 
 # Contribution:
 Reporting Bugs:
