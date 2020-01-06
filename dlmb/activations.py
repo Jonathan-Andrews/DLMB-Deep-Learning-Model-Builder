@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
 
-from utils.helpers import *
+from utils.function_helpers import *
 
 
 class Base_Activation(metaclass=ABCMeta):
