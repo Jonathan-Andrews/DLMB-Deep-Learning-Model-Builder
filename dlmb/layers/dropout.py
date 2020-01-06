@@ -1,5 +1,5 @@
 from layers.base_layer import *
-from utils.helpers import *
+from utils.function_helpers import *
 
 
 class Dropout(Base_Layer):
