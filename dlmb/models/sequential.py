@@ -2,7 +2,7 @@ import json
 import numpy as np
 import copy
 
-from utils.helpers import *
+from utils import *
 
 import layers as la
 import losses as lo
@@ -162,52 +162,14 @@ class Sequential:
 
 				for i in range(len(model_layers)):
 					layer_data = model_layers["layer: %s" % i]
-					
+
 					new_layer = copy.copy(layers[layer_data["name"]])
 					new_layer.load(layer_data)
 					self.model.append(new_layer)
 
-
 		# Gets called if the program can't find the file_path.
 		except Exception as e:
 			raise FileNotFoundError("Can't find file path %s. Try saving the model or enter a correct file path." % file_path)
-
-
-	@accepts(self="any", data=np.ndarray, batch_size=int)
-	def get_batches(self, data, batch_size) -> list:
-		"""
-			get_batches() splits some data into batches based on batch sized
-
-			Arguments:
-				data       : ND_ARRAY : An n dimensional numpy array of data.
-				batch_size : int      : The number of items in each batch.
-
-			Returns:
-				batches : list : A list of n dimensional numpy arrays containing the batches.
-
-		"""
-
-		# Stores the batches.
-		batches = []
-
-		index = 0
-		for _ in range(len(data)):
-
-			# If the batch_size is bigger than the remaining data then just put the remaining data into a single batch and then break.
-			if batch_size > len(data[index:]):
-				batches.append(data[index:])
-				break
-			else:
-				batches.append(data[index:index+batch_size])
-
-			index += batch_size
-
-		# Fixes a problem that occurs when batch_size is bigger than the remaining data.
-		if len(batches[-1]) == 0:
-			batches = np.delete(batches, -1)
-
-		return batches
-
 
 	
 	@accepts(self="any", data=np.ndarray)
@@ -252,6 +214,10 @@ class Sequential:
 
 		"""
 
+		if len(x_features.shape) > 2:
+			x_shape = x_features.shape[1:]
+			x_features = x_features.reshape(*x_features.shape[:1], -1)
+
 		# Stores the cached_error.
 		cached_error = []
 		cached_accuracy = []
@@ -272,21 +238,21 @@ class Sequential:
 				y_features = y_features[p]
 
 			# Turn the data into batches.
-			x_batches = self.get_batches(x_features, batch_size)
-			y_batches = self.get_batches(y_features, batch_size)
+
+			x_batches = [np.squeeze(segment, axis=0) for segment, _, _, _, _ in get_segments(x_features, batch_size, x_features.shape[1], (batch_size, 0))]
+			y_batches = [np.squeeze(segment, axis=0) for segment, _, _, _, _ in get_segments(y_features, batch_size, y_features.shape[1], (batch_size, 0))]
 
 
 			# Goes through each batch.
 			for i in range(len(x_batches)):
 
 				# Get the individual batches.
-				x = x_batches[i]
+				x = x_batches[i].reshape((batch_size, ) + x_shape)
 				y = y_batches[i]
 
 
 				# Get the model's current state and the batch error and accuracy.
 				current_state = self.predict(x)
-
 
 				# Store the data
 				batch_error = np.mean(self.loss.map_data(y, current_state))
@@ -320,6 +286,5 @@ class Sequential:
 			# Prints to the terminal the average loss and accuracy for each epoch if epoch_info=True.		
 			if epoch_info:	
 				print("Epoch: %s; Loss: %s; Accuracy: %s;" % (epoch+1, np.mean(np.asarray(epoch_error)), np.mean(np.asarray(epoch_accuracy))))
-
 
 		return cached_error, cached_accuracy
