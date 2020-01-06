@@ -1,5 +1,5 @@
 import numpy as np
-from utils.helpers import *
+from utils.function_helpers import *
 
 @accepts(shape=tuple)
 def zeros(shape) -> np.ndarray:
