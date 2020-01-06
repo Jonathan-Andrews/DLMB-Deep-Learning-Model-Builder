@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
 
-from utils.helpers import *
+from utils.function_helpers import *
 
 
 # For all classes optimizations[0] is the calculated gradients W.R.T the vars from the layer, and anything other than that is just optimizations from the optimizer function.
