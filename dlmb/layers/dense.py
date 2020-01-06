@@ -1,5 +1,5 @@
 from layers.base_layer import *
-from utils.helpers import *
+from utils.function_helpers import *
 
 import activations as a
 import initializers as i
